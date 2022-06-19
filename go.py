@@ -148,20 +148,21 @@ async def inlinec(message: types.InlineQuery):
                             types.InlineQueryResultAudio(
                                 id = videoId,
                                 # audio_url = f'http://124.156.210.60:6705/ytb2mp3?vid={videoId}.mp3',
-                                audio_url = 'http://youtube.mp3.jellyqwq.com/ytb2mp3?vid={}'.format(videoId),
+                                audio_url = "http://youtube.mp3.jellyqwq.com/ytb2mp3?vid={}".format(videoId),
                                 title = title,
                                 performer = performer,
                                 # caption = i['name'] + '  -  ' + i['artists'][0]['name']
                             )
                         )
-                        log.info('http://youtube.mp3.jellyqwq.com/ytb2mp3?vid={}'.format(videoId))
+                        log.info("http://youtube.mp3.jellyqwq.com/ytb2mp3?vid={}".format(videoId))
                         # n += 1
                     except:
                         continue
                 else:
                     continue
             return await message.answer(
-                results = json.dumps(results),
+                # results = json.dumps(results),
+                results = results,
                 cache_time = 0
             )
         except:

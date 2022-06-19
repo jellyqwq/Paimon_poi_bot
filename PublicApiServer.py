@@ -18,12 +18,13 @@ ytb2mp3_recompile_2 = re.compile(r'''k__id\s+=\s+(["'])(.*?)\1''')
 ytb2mp3_recompile_3 = re.compile(r"""<a\s+(?:[^>]*?\s+)?href=(["'])(.*?)\1""")
 """正则表达式预编译区end"""
 
-def getY2Mate(link):
-    headers = {
+headers = {
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36',
         'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
         'accept-language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh-MO;q=0.7,zh;q=0.6'
     }
+
+def getY2Mate(link):
     r = requests.get(url=link, headers=headers)
     log.debug(r.status_code)
     return r.content, r.headers.get("content-length")
@@ -45,11 +46,11 @@ def ytb2mp3():
                 'ajax': 1
             }
             try:
-                response = requests.post("https://www.y2mate.com/mates/en249/analyze/ajax", p).json()
+                response = requests.post("https://www.y2mate.com/mates/en249/analyze/ajax", p, headers=headers, timeout=10).json()
             except:
                 log.error('request post error: https://www.youtube.com/watch?v={}'.format(videoId))
             else:
-                _id = re.search(r'''k__id\s+=\s+(["'])(.*?)\1''', response['result']).group().strip('''k__id = "''').strip('''"''')
+                _id = re.search(ytb2mp3_recompile_2, response['result']).group().strip('''k__id = "''').strip('''"''')
                 log.info('_id {}'.format(_id))
                 p2 = {
                     'type': 'youtube',
@@ -60,9 +61,9 @@ def ytb2mp3():
                     'ftype': 'mp3',
                     'fquality': 128
                 }
-                response = requests.post("https://www.y2mate.com/mates/convert", p2).json()["result"]
+                response = requests.post("https://www.y2mate.com/mates/convert", p2, headers=headers, timeout=10).json()["result"]
                 log.info('response:  {}'.format(response))
-                music_link=re.search(r"""<a\s+(?:[^>]*?\s+)?href=(["'])(.*?)\1""",response).group().strip('''<a href=''').strip('''"''')
+                music_link=re.search(ytb2mp3_recompile_3, response).group().strip('''<a href=''').strip('''"''')
                 log.info('music_link: {}'.format(music_link))
                 c, l = getY2Mate(music_link)
                 response = send_file(io.BytesIO(c), mimetype='audio/mpeg')
