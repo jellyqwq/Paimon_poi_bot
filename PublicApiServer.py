@@ -32,7 +32,8 @@ def getY2Mate(link):
 @pas.route('/ytb2mp3', methods=['GET', 'POST', 'OPTIONS'])
 def ytb2mp3():
     try:
-        videoId = request.values.get('vid')[:-4]
+        videoId = request.values.get('vid')
+        # videoId = videoId[:-4]
         log.info('videoId: {}'.format(videoId))
     except:
         log.error('parameter error')
@@ -60,27 +61,13 @@ def ytb2mp3():
                     'fquality': 128
                 }
                 response = requests.post("https://www.y2mate.com/mates/convert", p2).json()["result"]
+                log.info('response:  {}'.format(response))
                 music_link=re.search(r"""<a\s+(?:[^>]*?\s+)?href=(["'])(.*?)\1""",response).group().strip('''<a href=''').strip('''"''')
                 log.info('music_link: {}'.format(music_link))
                 c, l = getY2Mate(music_link)
-                # response = make_response(c, 200)
                 response = send_file(io.BytesIO(c), mimetype='audio/mpeg')
                 response.headers['Content-Type'] = 'audio/mpeg'
-                response.headers['Content-Disposition'] = 'inline; filename="{}.mp3"'.format(videoId)
-                response.headers['Connection'] = 'keep-alive'
-                response.headers['Accept-Ranges'] = 'bytes'
-                response.headers['Access-Control-Allow-Credentials'] = 'true'
-                response.headers['Access-Control-Allow-Headers'] = 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range'
-                response.headers['Access-Control-Allow-Methods'] = 'GET,POST,OPTIONS'
-                response.headers['Access-Control-Expose-Headers'] = 'Content-Range, Last-Modified'
-                response.headers['Access-Control-Allow-Origin'] = '*'
                 response.headers['Content-Length'] = l
-                # response.headers['Content-Range'] = 'bytes 0-{}/{}'.format(int(l)-1, l)
-                # response.headers['Keep-Alive'] = 'timeout=20, max=1000'
-                # response.headers['Proxy-Connection'] = 'keep-alive'
-                # response.headers['Server'] = 'Tengine'
-                # response.headers['Via'] = 'c48.l2cm9-2(0,1,206-0,H), c39.l2cm9-2(5,0), c33.l2cn3002(0,0,206-0,H), c35.l2cn3002(1,0), c35.l2cn3002(1,0), c5.cn4188(0,0,206-0,H), c11.cn4188(3,0)'
-                # print(response)
                 return response
         except:
             log.error('parse error')
@@ -89,5 +76,5 @@ def ytb2mp3():
 if __name__ == '__main__':
     log.info('服务器准备启动...')
     log.info('アトリは、高性能ですから!')
-    # pas.run(host='127.0.0.1', port=6705, debug=True)
-    pas.run(host='0.0.0.0', port=6705, debug=True)
+    pas.run(host='127.0.0.1', port=6705, debug=True)
+    # pas.run(host='0.0.0.0', port=6705, debug=True)

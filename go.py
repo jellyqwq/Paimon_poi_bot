@@ -1,9 +1,7 @@
 import json
 import re
 import time
-from pyparsing import WordEnd
 import requests
-from werkzeug._reloader import run_with_reloader
 import logging as log
 log.basicConfig(
     format='%(asctime)s %(levelname)s %(message)s',
@@ -69,7 +67,7 @@ async def inlinec(message: types.InlineQuery):
     log.info(word)
     results = []
     if len(word) <= 3:
-        await message.answer(
+        return await message.answer(
             results = results,
         )
     elif word[0:2] == 'ms':
@@ -89,7 +87,7 @@ async def inlinec(message: types.InlineQuery):
             log.info('succeed')
         except:
             log.info("Failed to")
-            await message.answer(
+            return await message.answer(
                 results = results,
             )
         else:
@@ -117,22 +115,13 @@ async def inlinec(message: types.InlineQuery):
                         n += 1
                 except:
                     continue
-            await message.answer(
+            return await message.answer(
                 results = results,
                 cache_time = 0
             )
     elif word[0:3] == 'yms':
         query = word[3:].strip()
         log.info(query)
-        # results.append(
-        #         types.InlineQueryResultAudio(
-        #             id = 'xxxx',
-        #             audio_url = 'https://jellyqwq.com/music/8xg3vE8Ie_E.mp3',
-        #             title = 'love story',
-        #             performer = 'Taylor Swift',
-        #             # caption = i['name'] + '  -  ' + i['artists'][0]['name']
-        #         )
-        #     )
         data = {
             "context": {
                 "client": {
@@ -159,29 +148,29 @@ async def inlinec(message: types.InlineQuery):
                             types.InlineQueryResultAudio(
                                 id = videoId,
                                 # audio_url = f'http://124.156.210.60:6705/ytb2mp3?vid={videoId}.mp3',
-                                audio_url = 'http://youtube.mp3.jellyqwq.com/ytb2mp3?vid={}.mp3'.format(videoId),
+                                audio_url = 'http://youtube.mp3.jellyqwq.com/ytb2mp3?vid={}'.format(videoId),
                                 title = title,
                                 performer = performer,
                                 # caption = i['name'] + '  -  ' + i['artists'][0]['name']
                             )
                         )
-                        log.info('http://youtube.mp3.jellyqwq.com/ytb2mp3?vid={}.mp3'.format(videoId))
+                        log.info('http://youtube.mp3.jellyqwq.com/ytb2mp3?vid={}'.format(videoId))
                         # n += 1
                     except:
                         continue
                 else:
                     continue
-            await message.answer(
+            return await message.answer(
                 results = json.dumps(results),
                 cache_time = 0
             )
         except:
-            await message.answer(
+            return await message.answer(
                 results = results,
                 cache_time = 0
             )
     else:
-        await message.answer(
+        return await message.answer(
             results = results,
             cache_time = 0
         )
@@ -320,14 +309,13 @@ async def on_shutdown(dp):
 
 
 if __name__ == '__main__':
-    run_with_reloader(
-        start_webhook(
-            dispatcher=dp,
-            webhook_path=WEBHOOK_PATH,
-            on_startup=on_startup,
-            on_shutdown=on_shutdown,
-            skip_updates=True,
-            host=WEBAPP_HOST,
-            port=WEBAPP_PORT,
-        )
+    start_webhook(
+        dispatcher=dp,
+        webhook_path=WEBHOOK_PATH,
+        on_startup=on_startup,
+        on_shutdown=on_shutdown,
+        skip_updates=True,
+        host=WEBAPP_HOST,
+        port=WEBAPP_PORT,
     )
+    
