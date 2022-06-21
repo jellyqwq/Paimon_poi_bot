@@ -32,47 +32,40 @@ def getY2Mate(link):
 
 @pas.route('/ytb2mp3', methods=['GET', 'POST', 'OPTIONS'])
 def ytb2mp3():
-    try:
+    # try:
         videoId = request.values.get('vid')
         # videoId = videoId[:-4]
         log.info('videoId: {}'.format(videoId))
-    except:
-        log.error('parameter error')
-    else:
-        try:
-            p = {
-                'url': f'https://www.youtube.com/watch?v={videoId}',
-                'q_auto': 0,
-                'ajax': 1
-            }
-            try:
-                response = requests.post("https://www.y2mate.com/mates/en249/analyze/ajax", p, headers=headers, timeout=10).json()
-            except:
-                log.error('request post error: https://www.youtube.com/watch?v={}'.format(videoId))
-            else:
-                _id = re.search(ytb2mp3_recompile_2, response['result']).group().strip('''k__id = "''').strip('''"''')
-                log.info('_id {}'.format(_id))
-                p2 = {
-                    'type': 'youtube',
-                    '_id': _id, 
-                    'v_id': videoId,
-                    'ajax': 1,
-                    'token': '',
-                    'ftype': 'mp3',
-                    'fquality': 128
-                }
-                response = requests.post("https://www.y2mate.com/mates/convert", p2, headers=headers, timeout=10).json()["result"]
-                log.info('response:  {}'.format(response))
-                music_link=re.search(ytb2mp3_recompile_3, response).group().strip('''<a href=''').strip('''"''')
-                log.info('music_link: {}'.format(music_link))
-                c, l = getY2Mate(music_link)
-                response = send_file(io.BytesIO(c), mimetype='audio/mpeg')
-                response.headers['Content-Type'] = 'audio/mpeg'
-                response.headers['Content-Length'] = l
-                return response
-        except:
-            log.error('parse error')
-            return json.dumps({'error': 0})
+        p = {
+            'url': f'https://www.youtube.com/watch?v={videoId}',
+            'q_auto': 0,
+            'ajax': 1
+        }
+        response = requests.post("https://www.y2mate.com/mates/en249/analyze/ajax", p, headers=headers, timeout=10).json()
+        log.error('request post error: https://www.youtube.com/watch?v={}'.format(videoId))
+        _id = re.search(ytb2mp3_recompile_2, response['result']).group().strip('''k__id = "''').strip('''"''')
+        log.info('_id {}'.format(_id))
+        p2 = {
+            'type': 'youtube',
+            '_id': _id, 
+            'v_id': videoId,
+            'ajax': 1,
+            'token': '',
+            'ftype': 'mp3',
+            'fquality': 128
+        }
+        response = requests.post("https://www.y2mate.com/mates/convert", p2, headers=headers, timeout=10).json()["result"]
+        log.info('response:  {}'.format(response))
+        music_link=re.search(ytb2mp3_recompile_3, response).group().strip('''<a href=''').strip('''"''')
+        log.info('music_link: {}'.format(music_link))
+        c, l = getY2Mate(music_link)
+        response = send_file(io.BytesIO(c), mimetype='audio/mpeg')
+        response.headers['Content-Type'] = 'audio/mpeg'
+        response.headers['Content-Length'] = l
+        return response
+    # except:
+    #     log.error('parse error')
+    #     return json.dumps({'error': 0})
 
 if __name__ == '__main__':
     log.info('服务器准备启动...')
