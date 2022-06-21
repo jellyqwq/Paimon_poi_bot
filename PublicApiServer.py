@@ -42,7 +42,7 @@ def ytb2mp3():
             'ajax': 1
         }
         response = requests.post("https://www.y2mate.com/mates/en249/analyze/ajax", p, headers=headers, timeout=10).json()
-        log.error('request post error: https://www.youtube.com/watch?v={}'.format(videoId))
+        # log.error('request post error: https://www.youtube.com/watch?v={}'.format(videoId))
         _id = re.search(ytb2mp3_recompile_2, response['result']).group().strip('''k__id = "''').strip('''"''')
         log.info('_id {}'.format(_id))
         p2 = {
